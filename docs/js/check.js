@@ -1,4 +1,5 @@
 const d = document;
+let attnum;
 const jsonData = `[
   {
    "Núm.": 1,
@@ -7159,35 +7160,57 @@ const data = JSON.parse(jsonData);
 let $boton = d.getElementById("search");
 let $results = d.getElementById("Results");
 
-$boton.addEventListener("click", function(){
+if (!localStorage.attempts) localStorage.attempts = '5';
+
+
+$boton.addEventListener("click", function () {
+  let counter = localStorage.attempts;
+  console.log(counter);
+  if (counter < 1){
+    $results.innerHTML = `
+    <h4>Lo sentimos, pero te has quedado sin intentos</h4>
+    `;
+    return;
+  }
   let $name = d.getElementById("name").value;
   let $rfc = d.getElementById("rfc").value;
   let name = $name;
   let pwd = $rfc;
-  login(name,pwd);
+  login(name, pwd);
   console.log(name);
   console.log(pwd);
 });
 
 function login(username, password) {
-  for (let i = 0; i < data.length; i++) {
-    if (data[i].display_name === username && data[i].user_pass === password) {
-      $results.innerHTML = `
-      <h3>Hola, ${data[i].first_name}!.</h3>
-      <div>La hora de tu conferencia es: ${data[i].FECHA_SESION_PLENARIA}</div>
-      <div>Y tu link es: <a href="${data[i].LINK_SESION_PLENARIA}">${data[i].LINK_SESION_PLENARIA}</a></div>
-      `;
-      
-      console.log(data[i].LINK_SESION_PLENARIA);
-      console.log("Login successful!");
-      return;
+    for (let i = 0; i < data.length; i++) {
+      if (data[i].display_name === username && data[i].user_pass === password) {
+        let countertoshow = localStorage.attempts -1;
+        $results.innerHTML = `
+        <h3>Hola, ${data[i].first_name}!.</h3>
+        <div>La hora de tu conferencia es: ${data[i].FECHA_SESION_PLENARIA}</div>
+        <div>Y tu link es: <a href="${data[i].LINK_SESION_PLENARIA}">${data[i].LINK_SESION_PLENARIA}</a></div>
+        <br>
+        <div>Tienes ${countertoshow} intentos mas.</div>
+        `;
+        
+        console.log(data[i].LINK_SESION_PLENARIA);
+        console.log("Login successful!");
+        attnum = localStorage.attempts -1 ;
+        localStorage.attempts = attnum;
+        return;
+      }
     }
+    let countertoshow = localStorage.attempts -1;
+    $results.innerHTML = `
+    <h4>Lo sentimos, pero no tenemos resultados, asegurate de escibir bien tu nombre con mayusculas. (Ej. SHIKA MORIYAMA)</h4>
+    <br>
+    <div>Tienes ${countertoshow} intentos mas.</div>
+    `;
+    attnum = localStorage.attempts -1 ;
+    localStorage.attempts = attnum;
+    console.log("Invalid username or password.");
   }
-  $results.innerHTML = `
-      <h4>Lo sentimos, pero no tenemos resultados, asegurate de escibir bien tu nombre con mayusculas. (Ej. SHIKA MORIYAMA)</h4>
-      `;
-  console.log("Invalid username or password.");
-}
+  
 
 
 /*
